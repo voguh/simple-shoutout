@@ -1,0 +1,131 @@
+@import url("https://fonts.googleapis.com/css?family=Nunito");
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  height: 100%;
+}
+
+* {
+  font-family: Nunito, sans-serif;
+  color: #FFFFFF;
+  box-sizing: border-box;
+}
+
+/* ================================================================================================================== */
+
+@keyframes avatarOpen {
+  from {
+    height: 0;
+    top: calc(20px + (258px / 2));
+  }
+  to {
+    height: 258px;
+    top: 20px;
+  }
+}
+
+@keyframes avatarClose {
+  from {
+    height: 258px;
+    top: 20px;
+  }
+  to {
+    height: 0;
+    top: calc(20px + (258px / 2));
+  }
+}
+
+.avatar-wrapper {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 16px;
+  position: relative;
+  width: 258px;
+  height: 0;
+  background: #2f2f2f;
+  box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.25);
+}
+
+.avatar-wrapper::after {
+  content: '';
+  border: 8px solid #B22222;
+  position: absolute;
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+  border-radius: 16px;
+  z-index: 1;
+}
+
+.avatar-wrapper > img {
+  width: 258px;
+  height: 258px;
+}
+
+/* ================================================================================================================== */
+
+@keyframes labelOpen {
+  from {
+    width: 0;
+  }
+  to {
+    width: 316px;
+  }
+}
+
+@keyframes labelClose {
+  from {
+    width: 316px;
+  }
+  to {
+    width: 0;
+  }
+}
+
+.label-wrapper {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 38px;
+  overflow: hidden;
+  background: #2f2f2f;
+  box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.25);
+  
+}
+
+.label-wrapper::before, .label-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 100%;
+  background: #b22222;
+  z-index: 1;
+}
+
+.label-wrapper::before {
+  left: 0;
+}
+
+.label-wrapper::after {
+  right: 0;
+}
+
+.label-wrapper > div {
+  position: absolute;
+  padding: 8px 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
