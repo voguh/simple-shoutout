@@ -1,1 +1,27 @@
-{}
+{
+  "commandPrefix": {
+    "type": "text",
+    "label": "Command prefix",
+    "value": "!so"
+  },
+  "userLevel": {
+    "type": "text",
+    "label": "User level",
+    "value": "BROADCASTER,MODERATOR"
+  },
+  "textColor": {
+    "type": "colorpicker",
+    "label": "Text color",
+    "value": "#FFFFFF"
+  },
+  "backgroundColor": {
+    "type": "colorpicker",
+    "label": "Background color",
+    "value": "#2F2F2F"
+  },
+  "accentColor": {
+    "type": "colorpicker",
+    "label": "Accent color",
+    "value": "#B22222"
+  }
+}

@@ -1,5 +1,14 @@
 @import url("https://fonts.googleapis.com/css?family=Nunito");
 
+:root {
+  --username-image-size: 242px;
+  --username-name-width: 316px;
+  --game-image-height: 100px;
+  --text-color: {{textColor}};
+  --background-color: {{backgroundColor}};
+  --accent-color: {{accentColor}};
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -9,123 +18,161 @@ html, body {
 
 * {
   font-family: Nunito, sans-serif;
-  color: #FFFFFF;
+  color: var(--text-color);
   box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* ================================================================================================================== */
 
-@keyframes avatarOpen {
-  from {
-    height: 0;
-    top: calc(20px + (258px / 2));
+.main-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ================================================================================================================== */
+
+@keyframes avatarOpening {
+  0% {
+    width: 0px;
+    border-left-width: 0;
+    border-right-width: 0;
   }
-  to {
-    height: 258px;
-    top: 20px;
+  1% {
+    border-width: 8px;
+  }
+  100% {
+    width: calc(var(--username-image-size) + 16px);
+    border-width: 8px;
   }
 }
 
 @keyframes avatarClose {
-  from {
-    height: 258px;
-    top: 20px;
+  0% {
+    width: calc(var(--username-image-size) + 16px);
+    border-width: 8px;
   }
-  to {
-    height: 0;
-    top: calc(20px + (258px / 2));
+  99% {
+    border-width: 8px;
+  }
+  100% {
+    width: 0;
+    border-left-width: 0;
+    border-right-width: 0;
   }
 }
 
-.avatar-wrapper {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+.main-container > .avatar-wrapper {
+  position: relative;
+  width: 0px;
+  height: calc(var(--username-image-size) + 16px);
+  border: 0 solid var(--accent-color);
+  border-radius: 16px;
+  background: var(--background-color);
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.main-container > .avatar-wrapper.open {
+  animation: avatarOpening 200ms linear forwards;
+}
+
+.main-container > .avatar-wrapper.close {
+  animation: avatarClose 200ms linear forwards;
+}
+
+.main-container > .avatar-wrapper > img {
+  width: var(--username-image-size);
+}
+
+.main-container > .avatar-wrapper > .avatar-wrapper {
+  width: calc((var(--username-image-size) / 3) + 8px);
+  height: calc((var(--username-image-size) / 3) + 8px);
+  border-top: 8px solid var(--accent-color);
+  border-left: 8px solid var(--accent-color);
+  border-top-left-radius: 8px;
+  background: var(--background-color);
   overflow: hidden;
-  border-radius: 16px;
-  position: relative;
-  width: 258px;
-  height: 0;
-  background: #2f2f2f;
-  box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.25);
-}
-
-.avatar-wrapper::after {
-  content: '';
-  border: 8px solid #B22222;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: absolute;
-  width: calc(100% - 16px);
-  height: calc(100% - 16px);
-  border-radius: 16px;
-  z-index: 1;
+  bottom: 50%;
+  right: 50%;
+  transform: translate(calc(var(--username-image-size) - (var(--username-image-size) / 2)), calc(var(--username-image-size) - (var(--username-image-size) / 2)));
+
 }
 
-.avatar-wrapper > img {
-  width: 258px;
-  height: 258px;
+.main-container > .avatar-wrapper > .avatar-wrapper > img {
+  width: calc(var(--username-image-size) / 3);
 }
 
-/* ================================================================================================================== */
+/* ============================================================================================== */
 
-@keyframes labelOpen {
-  from {
-    width: 0;
+@keyframes labelOpening {
+  0% {
+    width: 0px;
+    border-left-width: 0;
+    border-right-width: 0;
   }
-  to {
-    width: 316px;
+  1% {
+    border-width: 8px;
+  }
+  100% {
+    width: var(--username-name-width);
+    border-width: 8px;
   }
 }
 
 @keyframes labelClose {
-  from {
-    width: 316px;
+  0% {
+    width: var(--username-name-width);
+    border-width: 8px;
   }
-  to {
-    width: 0;
+  99% {
+    border-width: 8px;
+  }
+  100% {
+    width: 0px;
+    border-left-width: 0;
+    border-right-width: 0;
   }
 }
 
-.label-wrapper {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+.main-container > .label-wrapper {
+  position: relative;
   width: 0;
   height: 38px;
-  overflow: hidden;
-  background: #2f2f2f;
-  box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.25);
-  
-}
-
-.label-wrapper::before, .label-wrapper::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  width: 8px;
-  height: 100%;
-  background: #b22222;
-  z-index: 1;
-}
-
-.label-wrapper::before {
-  left: 0;
-}
-
-.label-wrapper::after {
-  right: 0;
-}
-
-.label-wrapper > div {
-  position: absolute;
-  padding: 8px 16px;
-  font-weight: 600;
+  background: var(--background-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Nunito, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
   white-space: nowrap;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+
+  border-left: 0 solid var(--accent-color);
+  border-right: 0 solid var(--accent-color);
+}
+
+.main-container > .label-wrapper.open {
+  animation: labelOpening 200ms linear forwards;
+}
+
+.main-container > .label-wrapper.close {
+  animation: labelClose 200ms linear forwards;
 }

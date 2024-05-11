@@ -1,75 +1,91 @@
-let decapiAPI = axios.create({ baseURL: 'https://decapi.me/twitch' })
+const fieldData = {}
+const vogAPI = axios.create({ baseURL: 'https://api.oscproject.net/twitch' })
+
+function getUserType(badges) {
+  if (badges.find((badge) => badge.type === 'broadcaster')) {
+    return 'BROADCASTER'
+  } else if (badges.find((badge) => badge.type === 'moderator')) {
+    return 'MODERATOR'
+  } else if (badges.find((badge) => badge.type === 'vip')) {
+    return 'VIP'
+    // TODO: See name of subscriber badge
+    // } else if (badges.find((badge) => badge.type === 'subscriber')) {
+    //   return 'SUBSCRIBER'
+  } else {
+    return 'VIEWER'
+  }
+}
 
 async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-let queue = async.queue(async (displayName) => {
-  const avatarWrapper = $('.avatar-wrapper')
-  const labelWrapper = $('.label-wrapper')
+const queue = async.queue(async function (displayName) {
+  displayName = displayName.startsWith('@') ? displayName.substring(1) : displayName
+  const userName = displayName.toLowerCase()
 
-  try {
-    const username = displayName.toLowerCase()
-    const { data: avatarURL } = await decapiAPI.get(`/avatar/${username}`)
-    const { data: gameName } = await decapiAPI.get(`/game/${username}`)
+  const mainContainer = $('.main-container')
+  if (mainContainer.length > 0) {
+    mainContainer.empty()
 
-    // Set avatar
-    const avatarElement = $.parseHTML(`<img src="${avatarURL}" />`)
-    avatarWrapper.attr('style', 'animation: avatarOpen 250ms ease forwards;')
-    avatarWrapper.append(avatarElement)
+    try {
+      const { data: avatarUrl } = await vogAPI.get(`/user/avatar/${userName}`)
+      const { data: gameName } = await vogAPI.get(`/channel/streamgame/${userName}`)
+      const { data: gameBoxArtUrl } = await vogAPI.get(`/game/boxart/${gameName}`)
 
-    // Set user display name
-    const displayNameElement = $.parseHTML(`<div>${displayName}</div>`)
-    labelWrapper.attr('style', 'animation: labelOpen 250ms ease forwards;')
-    labelWrapper.html(displayNameElement)
+      const avatarWrapper = $(`<div class="avatar-wrapper"><img src="${avatarUrl}" /></div>`)
+      mainContainer.append(avatarWrapper)
 
-    // Await 5 seconds to close label wrapper
-    await sleep(5000)
+      const labelWrapper = $(`<div class="label-wrapper">${displayName}</div>`)
+      mainContainer.append(labelWrapper)
 
-    // Trigger close animation of label to replace label text for game name if game name exists
-    if (gameName != null && gameName.trim().length > 0) {
-      labelWrapper.attr('style', 'animation: labelClose 250ms ease forwards;')
-      await sleep(250)
+      /* ======================================================================================== */
 
-      // Display game name
-      const gameNameElement = $.parseHTML(`<div>${gameName}</div>`)
-      labelWrapper.attr('style', 'animation: labelOpen 250ms ease forwards;')
-      labelWrapper.html(gameNameElement)
+      avatarWrapper.addClass('open')
+      labelWrapper.addClass('open')
 
-      // Await 5 seconds to close shoutout card
       await sleep(5000)
-    }
+      avatarWrapper.addClass('close').removeClass('open')
+      labelWrapper.addClass('close').removeClass('open')
 
-    // Trigger close animations
-    avatarWrapper.attr('style', 'animation: avatarClose 250ms ease forwards;')
-    labelWrapper.attr('style', 'animation: labelClose 250ms ease forwards;')
-    await sleep(250)
-  } catch (e) {
-    console.log(e.message)
-    console.error(e)
-  } finally {
-    // Remove items
-    avatarWrapper.removeAttr('style').empty()
-    labelWrapper.removeAttr('style').empty()
+      await sleep(200)
+      avatarWrapper.html(`<img src="${gameBoxArtUrl}" /><div class="avatar-wrapper"><img src="${avatarUrl}" /></div>`)
+      labelWrapper.text(gameName)
+      avatarWrapper.addClass('open').removeClass('close')
+      labelWrapper.addClass('open').removeClass('close')
+
+      await sleep(5000)
+      avatarWrapper.addClass('close').removeClass('open')
+      labelWrapper.addClass('close').removeClass('open')
+
+      await sleep(200)
+      mainContainer.empty()
+    } catch (e) {
+      console.log(e.message)
+      console.error(e)
+    }
   }
 })
 
 /* ================================================================================================================== */
 
-window.addEventListener('onWidgetLoad', async function (obj) {})
+window.addEventListener('onWidgetLoad', async function (obj) {
+  Object.assign(fieldData, {
+    ...obj.detail.fieldData,
+    commandPrefix: obj.detail.fieldData.commandPrefix ?? '!so',
+    userLevel: (obj.detail.fieldData.userLevel ?? 'BROADCASTER,MODERATOR').split(',').map((ul) => ul.trim())
+  })
+})
 
 window.addEventListener('onEventReceived', function (obj) {
-  const detail = obj.detail
+  const listener = obj.detail.listener
+  const event = obj.detail.event
 
-  switch (detail.listener) {
-    case 'message':
-      const data = detail.event.data
-      const badges = data.tags.badges
-      const message = data.text
-
-      if (message.startsWith('!so') && (badges.includes('broadcaster') || badges.includes('moderator'))) {
-        queue.push((message ?? '').replace('!so', '').replace(/\W/g, ''))
-      }
-      break
+  if (listener === 'message') {
+    const badges = event.data.badges
+    const [cmd, toUser] = (event.data.text ?? '').trim().split(' ')
+    if (cmd === fieldData.commandPrefix && fieldData.userLevel.includes(getUserType(badges))) {
+      queue.push(toUser)
+    }
   }
 })
